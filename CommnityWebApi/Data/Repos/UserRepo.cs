@@ -28,12 +28,12 @@ namespace CommnityWebApi.Data.Repos
 
         public async Task<User?> GetUserById(int id)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
+            return await _context.Users.SingleOrDefaultAsync(u => u.UserId == id);
         }
 
         public async Task<User> UpdateUser(int id, string? userName, string? email, string? passwordHash)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserId == id);
 
             if(user == null)
             {

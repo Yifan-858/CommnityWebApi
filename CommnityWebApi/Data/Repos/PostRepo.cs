@@ -30,14 +30,14 @@ namespace CommnityWebApi.Data.Repos
             return await _context.Posts.Where(p=> p.UserId == userId).ToListAsync();
         }
 
-        public async Task<Post> GetPostById(int postId)
+        public async Task<Post?> GetPostById(int postId)
         {
-            return await _context.Posts.FirstOrDefaultAsync(p=> p.PostId == postId);
+            return await _context.Posts.SingleOrDefaultAsync(p=> p.PostId == postId);
         }
 
         public async Task<Post> UpdatePost(int postId, string? title, string? text, List<Category>? category)
         {
-            var post = await _context.Posts.FirstOrDefaultAsync(p=> p.PostId==postId);
+            var post = await _context.Posts.SingleOrDefaultAsync(p=> p.PostId==postId);
 
             if(post == null)
             {
