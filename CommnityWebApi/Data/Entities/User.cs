@@ -15,11 +15,11 @@ namespace CommnityWebApi.Data.Entities
         [Required]
         public string PasswordHash { get; set; }
 
-        public User(int userId, string userName, string email)
+        public User(string userName, string email, string passwordHash)
         {
-            UserId = userId;
             UserName = userName;
             Email = email;
+            PasswordHash = passwordHash;
         }
     }
 }
