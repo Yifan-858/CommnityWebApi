@@ -16,6 +16,7 @@ builder.Services.AddDbContext<UserContext>(options =>
 
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IPostRepo, PostRepo>();
 
 var app = builder.Build();
 
