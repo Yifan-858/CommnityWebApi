@@ -16,10 +16,20 @@ namespace CommnityWebApi.Data.Entities
         [Key]
         public int PostId { get; set; }
         public string Title { get; set; }
-        public string Text { get; set; }
+        public string Text { get; set; } 
         public List<Category> Category { get; set; }
-
         public int UserId { get; set; }
-        public User User { get; set; }
+        public User User { get; set; } = default!;
+
+        public Post(string? title, string? text, List<Category>? category, int userId)
+        {
+            Title = title?? "Untitled";
+            Text = text ?? string.Empty;
+            Category = category ?? new List<Category>();
+            UserId = userId;
+        }
     }
+
+
+
 }

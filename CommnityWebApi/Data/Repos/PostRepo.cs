@@ -1,5 +1,6 @@
 ﻿using CommnityWebApi.Data.Entities;
 using CommnityWebApi.Data.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace CommnityWebApi.Data.Repos
 {
@@ -11,9 +12,69 @@ namespace CommnityWebApi.Data.Repos
             _context = context;
         }
 
-        //public async Task<Post>
-        //{
+        public async Task<Post> CreatePost(string title, string text, List<Category> category, int userId)
+        {
+            var post = new Post(title, text, category, userId);
+            _context.Posts.Add(post);
+            await _context.SaveChangesAsync();
+            return post;
+        }
 
-        //}
+        public async Task<List<Post>> GetAllPosts()
+        {
+            return await _context.Posts.ToListAsync();
+        }
+
+        public async Task<List<Post>> GetPostsByUser(int userId)
+        {
+            return await _context.Posts.Where(p=> p.UserId == userId).ToListAsync();
+        }
+
+        public async Task<Post> GetPostById(int postId)
+        {
+            return await _context.Posts.FirstOrDefaultAsync(p=> p.PostId == postId);
+        }
+
+        public async Task<Post> UpdatePost(int postId, string? title, string? text, List<Category>? category)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(p=> p.PostId==postId);
+
+            if(post == null)
+            {
+                throw new KeyNotFoundException($"Post id{postId} not found");
+            }
+
+            if(!string.IsNullOrEmpty(title))
+            {
+                post.Title = title;
+            }
+
+            if (!string.IsNullOrEmpty(text))
+            {
+                post.Text = text;
+            }
+
+            if (category != null)
+            {
+                post.Category = category;
+            }
+
+            await _context.SaveChangesAsync();
+            return post;
+        }
+
+        public async Task<bool> DeletePost(int postId)
+        {
+            var post = _context.Posts.FirstOrDefault(p=> p.PostId == postId);
+            if(post == null)
+            {
+                return false;
+            }
+
+            _context.Posts.Remove(post);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
