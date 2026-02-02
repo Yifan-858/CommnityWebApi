@@ -31,6 +31,11 @@ namespace CommnityWebApi.Data.Repos
             return await _context.Users.SingleOrDefaultAsync(u => u.UserId == id);
         }
 
+         public async Task<User?> GetUserByEmail(string email)
+        {
+            return await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+        }
+
         public async Task<User> UpdateUser(int id, string? userName, string? email, string? passwordHash)
         {
             var user = await _context.Users.SingleOrDefaultAsync(u => u.UserId == id);

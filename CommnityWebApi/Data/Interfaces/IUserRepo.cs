@@ -11,6 +11,8 @@ namespace CommnityWebApi.Data.Interfaces
 
         Task<User?> GetUserById(int id);
 
+        Task<User?> GetUserByEmail(string email);
+
         Task<User> UpdateUser(int id, string? userName, string? email, string? passwordHash);
 
         Task<bool> DeleteUser(int id);

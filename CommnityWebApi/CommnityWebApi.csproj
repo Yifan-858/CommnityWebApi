@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Core\Interfaces\" />
-    <Folder Include="Core\Services\" />
     <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
