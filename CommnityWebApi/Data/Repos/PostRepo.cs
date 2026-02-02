@@ -17,6 +17,12 @@ namespace CommnityWebApi.Data.Repos
             var post = new Post(title, text, category, userId);
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
+
+            //load User
+            await _context.Entry(post)
+                  .Reference(p => p.User)
+                  .LoadAsync();
+
             return post;
         }
 

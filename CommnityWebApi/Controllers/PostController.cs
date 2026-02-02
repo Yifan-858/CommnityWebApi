@@ -42,10 +42,12 @@ namespace CommnityWebApi.Controllers
 
             var postDTO = new PostDTO
             {
+                PostId = post.PostId,
                 Title = post.Title,
                 Text = post.Text,
                 Category = post.Category,
-                UserId = userId,
+                UserId = post.UserId,
+                UserName = post.User.UserName
             };
 
             return Ok(postDTO);
