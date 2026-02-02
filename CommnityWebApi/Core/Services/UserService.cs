@@ -42,7 +42,8 @@ namespace CommnityWebApi.Core.Services
             var audience = _configuration["Jwt:Audience"];
 
             List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Role,"Admin"));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()));
+            claims.Add(new Claim(ClaimTypes.Role,"User"));
                 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 
@@ -52,7 +53,7 @@ namespace CommnityWebApi.Core.Services
                      issuer: issuer,
                      audience: audience, 
                      claims: claims, 
-                     expires: DateTime.Now.AddMinutes(20), 
+                     expires: DateTime.UtcNow.AddMinutes(20), 
                      signingCredentials: signinCredentials);
 
      

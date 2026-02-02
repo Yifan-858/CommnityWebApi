@@ -12,7 +12,7 @@ namespace CommnityWebApi.Data.Repos
             _context = context;
         }
 
-        public async Task<Post> CreatePost(string title, string text, List<Category> category, int userId)
+        public async Task<Post> CreatePost(string? title, string? text, List<string>? category, int userId)
         {
             var post = new Post(title, text, category, userId);
             _context.Posts.Add(post);
@@ -35,7 +35,7 @@ namespace CommnityWebApi.Data.Repos
             return await _context.Posts.SingleOrDefaultAsync(p=> p.PostId == postId);
         }
 
-        public async Task<Post> UpdatePost(int postId, string? title, string? text, List<Category>? category)
+        public async Task<Post> UpdatePost(int postId, string? title, string? text, List<string>? category)
         {
             var post = await _context.Posts.SingleOrDefaultAsync(p=> p.PostId==postId);
 

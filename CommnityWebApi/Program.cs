@@ -16,6 +16,7 @@ var connectionString = builder.Configuration
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 
 builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
 
 //DI
 builder.Services.AddDbContext<UserContext>(options =>
@@ -44,6 +45,7 @@ builder.Services.AddAuthentication(opt => {
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IPostRepo, PostRepo>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 var app = builder.Build();
 
@@ -51,6 +53,12 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSwagger();
+app.UseSwaggerUI(endpoint =>
+{
+endpoint.SwaggerEndpoint("/swagger/v1/swagger.json", "My API dok");
+});
 
 app.UseEndpoints(endpoints =>
 {

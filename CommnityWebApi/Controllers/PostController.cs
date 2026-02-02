@@ -1,0 +1,94 @@
+﻿using CommnityWebApi.Core.Interfaces;
+using CommnityWebApi.Data.DTO;
+using CommnityWebApi.Data.Entities;
+using CommnityWebApi.Data.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace CommnityWebApi.Controllers
+{
+    [Route("[controller]")]
+    [ApiController]
+    public class PostController : ControllerBase
+    {
+        private readonly IPostService _postService;
+        private readonly IPostRepo _postRepo;
+
+        public PostController(IPostService postService, IPostRepo postRepo)
+        {
+            _postService = postService;
+            _postRepo = postRepo;
+        }
+
+        [Authorize]
+        [HttpPost("publish")]
+        public async Task<IActionResult> PublishPost([FromBody] PublishDTO dto)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            Post post;
+           
+            try
+            {
+               post = await _postService.CreatePost(dto.Title,dto.Text,dto.Category, userId);
+               
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+            var postDTO = new PostDTO
+            {
+                Title = post.Title,
+                Text = post.Text,
+                Category = post.Category,
+                UserId = userId,
+            };
+
+            return Ok(postDTO);
+ 
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllPosts()
+        {
+            List<Post> posts = await _postRepo.GetAllPosts();
+
+            if(posts == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(posts);
+        }
+
+        [HttpGet("user/{usreId}/posts")]
+        public async Task<IActionResult> GetAllPostsFromUser(int userId)
+        {
+            List<Post> posts = await _postRepo.GetPostsByUser(userId);
+
+            if(posts == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(posts);
+        }
+
+        [HttpGet("{postId}")]
+        public async Task<IActionResult> GetSinglePostFromUser(int postId)
+        {
+            var post = await _postRepo.GetPostById(postId);
+
+            if(post == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(post);
+        }
+    }
+}   

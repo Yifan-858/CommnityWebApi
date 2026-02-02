@@ -3,8 +3,10 @@ using CommnityWebApi.Core.Interfaces;
 using CommnityWebApi.Data.DTO;
 using CommnityWebApi.Data.Entities;
 using CommnityWebApi.Data.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CommnityWebApi.Controllers
 {
@@ -31,28 +33,30 @@ namespace CommnityWebApi.Controllers
                 var user = await _userService.RegisterUser(userName, email, password);
                 return Ok($"User {userName} is registered!");
             }
-            catch(Exception ex) { return BadRequest(ex.Message); }  
+            catch (Exception ex) { return BadRequest(ex.Message); }
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO login)
         {
-            User user = await _userService.Login(login);
-            if (user != null)
+            try
             {
-                return Ok(_userService.GenerateToken(user));
+                var user = await _userService.Login(login);
+                var token = _userService.GenerateToken(user);
+                return Ok(token);
             }
-
-            return Unauthorized("Invalid login");
+            catch (Exception ex)
+            { return Unauthorized("Invalid login"); }
         }
 
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(int id)
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
         {
-            var user = await _userRepo.GetUserById(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userRepo.GetUserById(int.Parse(userId));
 
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
@@ -61,5 +65,20 @@ namespace CommnityWebApi.Controllers
 
             return Ok(userDTO);
         }
+
+        //[Authorize(Roles = "Admin")]
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetUserById(int id)
+        //{
+        //    var user = await _userRepo.GetUserById(id);
+        //    if(user == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    AdmincheckDTO userDTO = _mapper.Map<AdmincheckDTO>(user);
+
+            //return Ok(AdminCheckDTO);
+        //}
     }
 }
