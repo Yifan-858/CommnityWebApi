@@ -11,8 +11,10 @@ using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 var builder = WebApplication.CreateBuilder(args);
+
 var connectionString = builder.Configuration
                     .GetConnectionString("DefaultConnection");
+
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 
 builder.Services.AddControllers();

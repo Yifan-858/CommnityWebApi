@@ -5,6 +5,7 @@ using CommnityWebApi.Data.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Security.Claims;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -15,12 +16,10 @@ namespace CommnityWebApi.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
-        private readonly IPostRepo _postRepo;
 
-        public PostController(IPostService postService, IPostRepo postRepo)
+        public PostController(IPostService postService)
         {
             _postService = postService;
-            _postRepo = postRepo;
         }
 
         [Authorize]
@@ -32,7 +31,7 @@ namespace CommnityWebApi.Controllers
            
             try
             {
-               post = await _postService.CreatePost(dto.Title,dto.Text,dto.Category, userId);
+               post = await _postService.CreatePost(dto.Title, dto.Text, dto.Category, userId);
                
             }
             catch (Exception ex)
@@ -57,22 +56,18 @@ namespace CommnityWebApi.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllPosts()
         {
-            List<Post> posts = await _postRepo.GetAllPosts();
+            List<PostDTO> postDTOs = await _postService.GetAllPosts();
 
-            if(posts == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(posts);
+            return Ok(postDTOs);
         }
 
-        [HttpGet("user/{usreId}/posts")]
+        [HttpGet("user/{userId}/posts")]
         public async Task<IActionResult> GetAllPostsFromUser(int userId)
         {
-            List<Post> posts = await _postRepo.GetPostsByUser(userId);
+            List<Post> posts = await _postService.GetPostsByUser(userId);
 
-            if(posts == null)
+            //do not use posts==null, repo doesnot return null
+            if(!posts.Any())
             {
                 return NotFound();
             }
@@ -83,7 +78,7 @@ namespace CommnityWebApi.Controllers
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetSinglePostFromUser(int postId)
         {
-            var post = await _postRepo.GetPostById(postId);
+            var post = await _postService.GetPostById(postId);
 
             if(post == null)
             {
@@ -92,5 +87,9 @@ namespace CommnityWebApi.Controllers
 
             return Ok(post);
         }
+
+        //searchByTitle+Category GET
+        //update guarded
+        //delete guarded
     }
 }   

@@ -66,6 +66,9 @@ namespace CommnityWebApi.Controllers
             return Ok(userDTO);
         }
 
+        //update
+        //delete
+
         //[Authorize(Roles = "Admin")]
         //[HttpGet("{id}")]
         //public async Task<IActionResult> GetUserById(int id)

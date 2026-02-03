@@ -18,15 +18,16 @@ namespace CommnityWebApi.Data.Entities
         public int PostId { get; set; }
         public string Title { get; set; }
         public string Text { get; set; } 
-        public List<string> Category { get; set; }
+        //Many to many
+        public List<Category> Category { get; set; }
+
         public int UserId { get; set; }
         public User User { get; set; } = default!;
 
-        public Post(string? title, string? text, List<string>? category, int userId)
+        public Post(string? title, string? text, int userId)
         {
             Title = title?? "Untitled";
             Text = text ?? string.Empty;
-            Category = category ?? new List<string>();
             UserId = userId;
         }
     }

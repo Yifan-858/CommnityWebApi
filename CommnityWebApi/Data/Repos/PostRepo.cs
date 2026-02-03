@@ -12,9 +12,18 @@ namespace CommnityWebApi.Data.Repos
             _context = context;
         }
 
-        public async Task<Post> CreatePost(string? title, string? text, List<string>? category, int userId)
+        public async Task<Post> CreatePost(string? title, string? text, List<int>? categoryIds, int userId)
         {
-            var post = new Post(title, text, category, userId);
+            var post = new Post(title, text, userId);
+
+            if(categoryIds != null && categoryIds.Any())
+            {
+                var categories = await _context.Category
+                    .Where(c => categoryIds.Contains(c.CategoryId)).ToListAsync();
+
+                post.Category = categories;
+            }
+
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
 
@@ -28,7 +37,10 @@ namespace CommnityWebApi.Data.Repos
 
         public async Task<List<Post>> GetAllPosts()
         {
-            return await _context.Posts.ToListAsync();
+            return await _context.Posts
+                .Include(p => p.User)
+                .Include(p => p.Category)
+                .ToListAsync();
         }
 
         public async Task<List<Post>> GetPostsByUser(int userId)
@@ -41,7 +53,7 @@ namespace CommnityWebApi.Data.Repos
             return await _context.Posts.SingleOrDefaultAsync(p=> p.PostId == postId);
         }
 
-        public async Task<Post> UpdatePost(int postId, string? title, string? text, List<string>? category)
+        public async Task<Post> UpdatePost(int postId, string? title, string? text)
         {
             var post = await _context.Posts.SingleOrDefaultAsync(p=> p.PostId==postId);
 
@@ -60,10 +72,10 @@ namespace CommnityWebApi.Data.Repos
                 post.Text = text;
             }
 
-            if (category != null)
-            {
-                post.Category = category;
-            }
+            //if (category != null)
+            //{
+            //    post.Category = category;
+            //}
 
             await _context.SaveChangesAsync();
             return post;
