@@ -26,11 +26,11 @@ namespace CommnityWebApi.Controllers
         }
 
         [HttpPost("signup")]
-        public async Task<IActionResult> SignUp(string userName, string email, string password)
+        public async Task<IActionResult> SignUp([FromBody] SignUpDTO signUpDTO)
         {
             try
             {
-                var user = await _userService.RegisterUser(userName, email, password);
+                var userName = await _userService.RegisterUser(signUpDTO);
                 return Ok($"User {userName} is registered!");
             }
             catch (Exception ex) { return BadRequest(ex.Message); }

@@ -18,13 +18,13 @@ var connectionString = builder.Configuration
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddSwaggerGen();
 
 //DI
 builder.Services.AddDbContext<UserContext>(options =>
     options.UseSqlServer(connectionString));
-
-builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddAuthentication(opt => {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

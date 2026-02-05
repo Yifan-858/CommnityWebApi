@@ -6,7 +6,7 @@ namespace CommnityWebApi.Core.Interfaces
 {
     public interface IUserService
     {
-        Task<User> RegisterUser(string userName, string email, string password);
+        Task<string> RegisterUser([FromBody] SignUpDTO signUpDTO);
         string GenerateToken(User user);
         Task<User> Login([FromBody] LoginDTO login);
     }

@@ -1,4 +1,5 @@
-﻿using CommnityWebApi.Core.Interfaces;
+﻿using AutoMapper;
+using CommnityWebApi.Core.Interfaces;
 using CommnityWebApi.Data.DTO;
 using CommnityWebApi.Data.Entities;
 using CommnityWebApi.Data.Interfaces;
@@ -9,10 +10,12 @@ namespace CommnityWebApi.Core.Services
     public class PostService: IPostService
     {
         private readonly IPostRepo _postRepo;
+        private readonly IMapper _mapper;
 
-        public PostService(IPostRepo postRepo)
+        public PostService(IPostRepo postRepo, IMapper mapper)
         {
             _postRepo = postRepo;
+            _mapper = mapper;
         }
 
         public async Task<Post> CreatePost(string? title, string? text, List<int>? categoryIds, int userId)
@@ -30,15 +33,7 @@ namespace CommnityWebApi.Core.Services
         public async Task<List<PostDTO>> GetAllPosts()
         {
             var posts = await _postRepo.GetAllPosts();
-            var postDTOs = posts.Select(p => new PostDTO
-            {
-                PostId = p.PostId,
-                Title = p.Title,
-                Text = p.Text,
-                Category = p.Category,
-                UserId = p.UserId,
-                UserName = p.User.UserName,
-            }).ToList();
+            var postDTOs = _mapper.Map<List<PostDTO>>(posts);
 
             return postDTOs;
         }

@@ -21,18 +21,18 @@ namespace CommnityWebApi.Core.Services
             _configuration = configuration;
         }
 
-        public async Task<User> RegisterUser(string userName, string email, string password)
+        public async Task<string> RegisterUser([FromBody] SignUpDTO signUpDTO)
         {
-            var isExisting = await _userRepo.GetUserByEmail(email);
+            var isExisting = await _userRepo.GetUserByEmail(signUpDTO.Email);
             if(isExisting != null)
             {
                 throw new Exception("Email is already registered.");
             }
 
-            string passwordHash = password + "Hash";
-            var user = await _userRepo.CreateUser(userName, email, passwordHash);
+            string passwordHash = signUpDTO.Password + "Hash";
+            var user = await _userRepo.CreateUser(signUpDTO.UserName, signUpDTO.Email, passwordHash);
 
-            return user;
+            return user.UserName;
         }
 
         public string GenerateToken(User user)

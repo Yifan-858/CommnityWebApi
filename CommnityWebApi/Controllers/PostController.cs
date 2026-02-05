@@ -1,4 +1,5 @@
-﻿using CommnityWebApi.Core.Interfaces;
+﻿using AutoMapper;
+using CommnityWebApi.Core.Interfaces;
 using CommnityWebApi.Data.DTO;
 using CommnityWebApi.Data.Entities;
 using CommnityWebApi.Data.Interfaces;
@@ -16,10 +17,12 @@ namespace CommnityWebApi.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
+        private readonly IMapper _mapper;
 
-        public PostController(IPostService postService)
+        public PostController(IPostService postService, IMapper mapper)
         {
             _postService = postService;
+            _mapper = mapper;
         }
 
         [Authorize]
@@ -39,15 +42,7 @@ namespace CommnityWebApi.Controllers
                 return StatusCode(500, ex.Message);
             }
 
-            var postDTO = new PostDTO
-            {
-                PostId = post.PostId,
-                Title = post.Title,
-                Text = post.Text,
-                Category = post.Category,
-                UserId = post.UserId,
-                UserName = post.User.UserName
-            };
+            var postDTO = _mapper.Map<PostDTO>(post);
 
             return Ok(postDTO);
  
