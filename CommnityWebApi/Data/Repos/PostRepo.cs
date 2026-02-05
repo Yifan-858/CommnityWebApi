@@ -83,7 +83,7 @@ namespace CommnityWebApi.Data.Repos
 
         public async Task<bool> DeletePost(int postId)
         {
-            var post = _context.Posts.FirstOrDefault(p=> p.PostId == postId);
+            var post = await _context.Posts.FindAsync(postId);//search for primary key
             if(post == null)
             {
                 return false;

@@ -46,8 +46,10 @@ builder.Services.AddAuthentication(opt => {
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IPostRepo, PostRepo>();
+builder.Services.AddScoped<ICommentRepo, CommentRepo>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPostService, PostService>();
+
 
 var app = builder.Build();
 
