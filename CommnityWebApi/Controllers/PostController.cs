@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using CommnityWebApi.Core.Interfaces;
+using CommnityWebApi.Core.Services;
 using CommnityWebApi.Data.DTO;
 using CommnityWebApi.Data.Entities;
 using CommnityWebApi.Data.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -18,11 +20,15 @@ namespace CommnityWebApi.Controllers
     {
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
+        private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public PostController(IPostService postService,ICommentService commentService)
+        public PostController(IPostService postService, ICommentService commentService, IUserService userService,IMapper mapper)
         {
             _postService = postService;
             _commentService = commentService;
+            _userService = userService;
+            _mapper = mapper;
         }
 
         [Authorize]
@@ -52,7 +58,7 @@ namespace CommnityWebApi.Controllers
         }
 
         [Authorize]
-        [HttpGet("all/comments")]
+        [HttpGet("all/with_comments")]
         public async Task<IActionResult> GetAllPostsWithComments()
         {
             List<PostDTO> postDTOs = await _postService.GetAllPosts();
@@ -105,8 +111,55 @@ namespace CommnityWebApi.Controllers
             return Ok(post);
         }
 
-        //searchByTitle+Category GET
-        //update guarded
-        //delete guarded
+        [HttpGet("search/{title}")]
+        public async Task<IActionResult> GetPostsByTitle([FromQuery] string title)
+        {
+            var posts = await _postService.GetPostsByTitle(title);
+            return Ok(posts);
+        }
+
+        [HttpGet("search/{categoryId}")]
+        public async Task<IActionResult> GetPostsByCategory([FromQuery] int categoryId)
+        {
+            var posts = await _postService.GetPostsByCategory(categoryId);
+            return Ok(posts);
+        }
+
+        [Authorize]
+        [HttpPatch("update")]
+        public async Task<IActionResult> UpdatePost([FromBody]UpdatePostDTO updatePostDTO)
+        {
+            var userIdentifier = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(!int.TryParse(userIdentifier, out var userId))
+            {
+                return BadRequest("Invalid access"); 
+            }
+
+            var currentUser = await _userService.GetUserById(userId);
+
+            if (currentUser == null)
+            {
+                return NotFound("User not found"); 
+            }
+
+            var updatedPost = await _postService.UpdatePost
+                (updatePostDTO.PostId, updatePostDTO.Title, updatePostDTO.Text, updatePostDTO.Category);
+
+            var postDto = _mapper.Map<PostDTO>(updatedPost);
+            return Ok(postDto);
+        }
+
+        [Authorize]
+        [HttpPatch("{postId}")]
+        public async Task<IActionResult> DeletePost(int postId)
+        {
+            try
+            {
+                await _userService.DeleteUser(postId);
+                return Ok($"Post with postId: {postId} is deleted");
+            }
+            catch (Exception ex) { return NotFound(ex.Message); }
+        }
+       
     }
 }   

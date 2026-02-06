@@ -53,7 +53,7 @@ namespace CommnityWebApi.Data.Repos
             return await _context.Posts.SingleOrDefaultAsync(p=> p.PostId == postId);
         }
 
-        public async Task<Post> UpdatePost(int postId, string? title, string? text)
+        public async Task<Post> UpdatePost(int postId, string? title, string? text, List<Category>? category)
         {
             var post = await _context.Posts.SingleOrDefaultAsync(p=> p.PostId==postId);
 
@@ -72,10 +72,10 @@ namespace CommnityWebApi.Data.Repos
                 post.Text = text;
             }
 
-            //if (category != null)
-            //{
-            //    post.Category = category;
-            //}
+            if (category != null)
+            {
+                post.Category = category;
+            }
 
             await _context.SaveChangesAsync();
             return post;
