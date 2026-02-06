@@ -8,5 +8,7 @@ namespace CommnityWebApi.Data.Entities
         public int CategoryId { get; set; }
         [Required]
         public string CategoryName { get; set; }
+
+        public List<Post> Posts { get; set; } = new();
     }
 }

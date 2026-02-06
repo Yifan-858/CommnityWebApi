@@ -11,12 +11,12 @@ namespace CommnityWebApi.Data.Entities
         public int UserId { get; set; }
         public User User { get; set; }
 
-        public int PostId { get; set; }
-        public Post Post { get; set; }
+        public int? PostId { get; set; }
+        public Post? Post { get; set; }
 
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
-        public Comment(string content, int userId, int postId, DateTime createAt)
+        public Comment(string content, int userId,  int? postId, DateTime createAt)
         {
             Content = content;
             UserId = userId;

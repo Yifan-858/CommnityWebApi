@@ -31,6 +31,8 @@ namespace CommnityWebApi.Controllers
             _mapper = mapper;
         }
 
+        
+
         [Authorize]
         [HttpPost("publish")]
         public async Task<IActionResult> PublishPost([FromBody] PublishDTO dto)
@@ -135,11 +137,16 @@ namespace CommnityWebApi.Controllers
                 return BadRequest("Invalid access"); 
             }
 
-            var currentUser = await _userService.GetUserById(userId);
+            var currentPost = await _postService.GetPostById(updatePostDTO.PostId);
 
-            if (currentUser == null)
+            if (currentPost == null)
             {
-                return NotFound("User not found"); 
+                return NotFound("Post not found"); 
+            }
+
+            if (userId != currentPost.UserId) 
+            {
+                return BadRequest("Unauthorized User");
             }
 
             var updatedPost = await _postService.UpdatePost
@@ -150,15 +157,33 @@ namespace CommnityWebApi.Controllers
         }
 
         [Authorize]
-        [HttpPatch("{postId}")]
+        [HttpDelete("{postId}")]
         public async Task<IActionResult> DeletePost(int postId)
         {
+            var userIdentifier = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(!int.TryParse(userIdentifier, out var userId))
+            {
+                return BadRequest("Invalid access"); 
+            }
+
+            var currentPost = await _postService.GetPostById(postId);
+
+            if (currentPost == null)
+            {
+                return NotFound("Post not found"); 
+            }
+
+            if (userId != currentPost.UserId) 
+            {
+                return BadRequest("Unauthorized User");
+            }
+
             try
             {
-                await _userService.DeleteUser(postId);
+                await _postService.DeletePost(postId);
                 return Ok($"Post with postId: {postId} is deleted");
             }
-            catch (Exception ex) { return NotFound(ex.Message); }
+            catch (KeyNotFoundException ex) { return NotFound(ex.Message); }
         }
        
     }

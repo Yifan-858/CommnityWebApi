@@ -82,7 +82,7 @@ namespace CommnityWebApi.Core.Services
         public async Task<List<PostDTO>> GetPostsByCategory(int categoryId)
         {
             var posts = await _context.Posts
-                .Where(p=> p.Category.Any(c=>c.CategoryId == categoryId))
+                .Where(p=> p.Categories.Any(c=>c.CategoryId == categoryId))
                 .ToListAsync();
            
             var postDtos = _mapper.Map<List<PostDTO>>(posts);
@@ -101,7 +101,7 @@ namespace CommnityWebApi.Core.Services
             var post = await _postRepo.GetPostById(postId);
             if (post == null)
             {
-                throw new Exception("Post not found");
+                throw new KeyNotFoundException("Post not found");
             }
 
             await _postRepo.DeletePost(postId);

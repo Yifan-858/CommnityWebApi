@@ -4,22 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CommnityWebApi.Data.Entities
 {
-    //public enum Category
-    //{
-    //    Art = 0,
-    //    Entertainment = 1,
-    //    Food = 2,
-    //    Lifestyle = 3,
-    //    Technology = 4
-    //}
     public class Post
     {
         [Key]
         public int PostId { get; set; }
         public string Title { get; set; }
-        public string Text { get; set; } 
+        public string Text { get; set; }
         //Many to many
-        public List<Category> Category { get; set; }
+        public List<Category> Categories { get; set; } = new();
 
         public int UserId { get; set; }
         public User User { get; set; } = default!;

@@ -4,6 +4,7 @@ using CommnityWebApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CommnityWebApi.Data.Migrations
 {
     [DbContext(typeof(UserContext))]
-    partial class UserContextModelSnapshot : ModelSnapshot
+    [Migration("20260206150159_RedoCommentPostFKNew")]
+    partial class RedoCommentPostFKNew
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace CommnityWebApi.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CategoryPost", b =>
-                {
-                    b.Property<int>("CategoriesCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PostsPostId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CategoriesCategoryId", "PostsPostId");
-
-                    b.HasIndex("PostsPostId");
-
-                    b.ToTable("CategoryPost");
-                });
 
             modelBuilder.Entity("CommnityWebApi.Data.Entities.Category", b =>
                 {
@@ -49,7 +37,12 @@ namespace CommnityWebApi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
                     b.HasKey("CategoryId");
+
+                    b.HasIndex("PostId");
 
                     b.ToTable("Category");
                 });
@@ -69,7 +62,7 @@ namespace CommnityWebApi.Data.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("PostId")
+                    b.Property<int>("PostId")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
@@ -136,26 +129,20 @@ namespace CommnityWebApi.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CategoryPost", b =>
+            modelBuilder.Entity("CommnityWebApi.Data.Entities.Category", b =>
                 {
-                    b.HasOne("CommnityWebApi.Data.Entities.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("CommnityWebApi.Data.Entities.Post", null)
-                        .WithMany()
-                        .HasForeignKey("PostsPostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Category")
+                        .HasForeignKey("PostId");
                 });
 
             modelBuilder.Entity("CommnityWebApi.Data.Entities.Comment", b =>
                 {
                     b.HasOne("CommnityWebApi.Data.Entities.Post", "Post")
                         .WithMany()
-                        .HasForeignKey("PostId");
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CommnityWebApi.Data.Entities.User", "User")
                         .WithMany()
@@ -177,6 +164,11 @@ namespace CommnityWebApi.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CommnityWebApi.Data.Entities.Post", b =>
+                {
+                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }

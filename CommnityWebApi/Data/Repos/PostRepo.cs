@@ -21,7 +21,7 @@ namespace CommnityWebApi.Data.Repos
                 var categories = await _context.Category
                     .Where(c => categoryIds.Contains(c.CategoryId)).ToListAsync();
 
-                post.Category = categories;
+                post.Categories = categories;
             }
 
             _context.Posts.Add(post);
@@ -39,7 +39,7 @@ namespace CommnityWebApi.Data.Repos
         {
             return await _context.Posts
                 .Include(p => p.User)
-                .Include(p => p.Category)
+                .Include(p => p.Categories)
                 .ToListAsync();
         }
 
@@ -74,7 +74,7 @@ namespace CommnityWebApi.Data.Repos
 
             if (category != null)
             {
-                post.Category = category;
+                post.Categories = category;
             }
 
             await _context.SaveChangesAsync();
