@@ -9,6 +9,7 @@ namespace CommnityWebApi.Data.Interfaces
     {
         Task<Comment> AddComment(string content, int userId, int postId, DateTime createAt);
         Task<List<Comment>> GetAllComments();
+        Task<Comment> GetSingleComment(int commentId);
         Task<List<Comment>> GetCommentsByUser(int userId);
         Task<List<Comment>> GetCommentsByPost(int postId);
         Task<bool> DeleteComment(int commentId);

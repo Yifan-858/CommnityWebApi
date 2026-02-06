@@ -17,12 +17,12 @@ namespace CommnityWebApi.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
-        private readonly IMapper _mapper;
+        private readonly ICommentService _commentService;
 
-        public PostController(IPostService postService, IMapper mapper)
+        public PostController(IPostService postService,ICommentService commentService)
         {
             _postService = postService;
-            _mapper = mapper;
+            _commentService = commentService;
         }
 
         [Authorize]
@@ -30,22 +30,17 @@ namespace CommnityWebApi.Controllers
         public async Task<IActionResult> PublishPost([FromBody] PublishDTO dto)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            Post post;
            
             try
             {
-               post = await _postService.CreatePost(dto.Title, dto.Text, dto.Category, userId);
-               
+               var postDTO = await _postService.CreatePost(dto.Title, dto.Text, dto.Category, userId);
+               return Ok(postDTO);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return BadRequest(ex.Message);
             }
 
-            var postDTO = _mapper.Map<PostDTO>(post);
-
-            return Ok(postDTO);
- 
         }
 
         [HttpGet("all")]
@@ -56,7 +51,34 @@ namespace CommnityWebApi.Controllers
             return Ok(postDTOs);
         }
 
-        [HttpGet("user/{userId}/posts")]
+        [Authorize]
+        [HttpGet("all/comments")]
+        public async Task<IActionResult> GetAllPostsWithComments()
+        {
+            List<PostDTO> postDTOs = await _postService.GetAllPosts();
+
+            var postsWithComments = new List<PostsWithCommentsDTO>();
+
+            foreach (var post in postDTOs) 
+            { 
+                var comments = await _commentService.GetCommentByPost(post.PostId);
+                postsWithComments.Add(new PostsWithCommentsDTO
+                {
+                    PostId = post.PostId,
+                    Title = post.Title,
+                    Text = post.Text,
+                    Category = post.Category,
+                    UserId = post.UserId,
+                    UserName = post.UserName,
+                    Comments = comments
+                });
+            }
+           
+            return Ok(postsWithComments);
+        }
+
+
+        [HttpGet("{userId}/posts")]
         public async Task<IActionResult> GetAllPostsFromUser(int userId)
         {
             List<Post> posts = await _postService.GetPostsByUser(userId);

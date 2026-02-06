@@ -46,7 +46,7 @@ namespace CommnityWebApi.Controllers
                 return Ok(token);
             }
             catch (Exception ex)
-            { return Unauthorized("Invalid login"); }
+            { return Unauthorized($"Invalid login: {ex}"); }
         }
 
         [Authorize]

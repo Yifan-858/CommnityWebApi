@@ -48,7 +48,7 @@ namespace CommnityWebApi.Data.Repos
             return await _context.Posts.Where(p=> p.UserId == userId).ToListAsync();
         }
 
-        public async Task<Post?> GetPostById(int postId)
+        public async Task<Post> GetPostById(int postId)
         {
             return await _context.Posts.SingleOrDefaultAsync(p=> p.PostId == postId);
         }

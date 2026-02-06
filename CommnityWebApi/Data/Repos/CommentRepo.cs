@@ -26,24 +26,26 @@ namespace CommnityWebApi.Data.Repos
 
         public async Task<List<Comment>> GetAllComments()
         {
-            var comments = await _context.Comment
+            return await _context.Comment
                             .Include(c => c.User)
                             .Include(c => c.Post)
                             .ToListAsync();
+        }
 
-            return comments;
+        public async Task<Comment> GetSingleComment(int commentId)
+        {
+            return await _context.Comment.FindAsync(commentId);
         }
 
         public async Task<List<Comment>> GetCommentsByUser(int userId)
         {
-            var comments = await _context.Comment.Where(c => c.UserId == userId).ToListAsync();
-            return comments;
+            return await _context.Comment.Where(c => c.UserId == userId).ToListAsync();
+           
         }
 
         public async Task<List<Comment>> GetCommentsByPost(int postId)
         { 
-            var comments = await _context.Comment.Where(c=> c.PostId == postId).ToListAsync();
-            return comments;
+            return await _context.Comment.Where(c=> c.PostId == postId).ToListAsync();
         }
 
         public async Task<bool> DeleteComment(int commentId)

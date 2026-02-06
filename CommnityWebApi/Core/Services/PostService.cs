@@ -18,7 +18,7 @@ namespace CommnityWebApi.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<Post> CreatePost(string? title, string? text, List<int>? categoryIds, int userId)
+        public async Task<PostDTO> CreatePost(string? title, string? text, List<int>? categoryIds, int userId)
         {
             var post= await _postRepo.CreatePost(title, text,categoryIds, userId);
 
@@ -26,8 +26,10 @@ namespace CommnityWebApi.Core.Services
             {
                 throw new Exception("Failed to create post.");
             }
+            
+            var postDTO = _mapper.Map<PostDTO>(post);
 
-            return post;
+            return postDTO;
         }
 
         public async Task<List<PostDTO>> GetAllPosts()
@@ -43,7 +45,7 @@ namespace CommnityWebApi.Core.Services
             return await _postRepo.GetPostsByUser(userId);
         }
 
-        public async Task<Post> GetPostById(int postId)
+        public async Task<PostDTO> GetPostById(int postId)
         {
             var post = await _postRepo.GetPostById(postId);
 
@@ -52,7 +54,8 @@ namespace CommnityWebApi.Core.Services
                 throw new KeyNotFoundException("Post not found");
             }
 
-            return post;
+            var postDTO = _mapper.Map<PostDTO>(post);
+            return postDTO;
         }
     }
 }
