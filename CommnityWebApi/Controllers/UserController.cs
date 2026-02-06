@@ -66,8 +66,47 @@ namespace CommnityWebApi.Controllers
             return Ok(userDTO);
         }
 
-        //update
-        //delete
+        [Authorize]
+        [HttpPatch("update")]
+        public async Task<IActionResult> UpdateMyProfile([FromBody]UpdateUserDTO updateUserDTO)
+        {
+            var userIdentifier = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(userIdentifier == null)
+            {
+                return BadRequest("Invalid access");
+            }
+            //if (!int.TryParse(userIdentifier, out var userId))
+            //{
+            //    return Unauthorized("Invalid user identity");
+            //}
+            var userId = int.Parse(userIdentifier);
+            var currentUser = await _userService.GetUserById(userId);
+
+            if (currentUser == null)
+            {
+                return NotFound("User not found"); 
+            }
+
+            var passwordHash = updateUserDTO.Password + "Hash";
+            var updatedUser = await _userService.UpdateUserProfile
+                (userId, updateUserDTO.UserName, updateUserDTO.Email, passwordHash);
+
+            var userDto = _mapper.Map<UserDTO>(updatedUser);
+            return Ok(userDto);
+        }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            try
+            {
+                await _userService.DeleteUser(id);
+                return Ok($"User with id: {id} is deleted");
+            }
+            catch (Exception ex) { return NotFound(ex.Message); }
+             
+        }
 
         //[Authorize(Roles = "Admin")]
         //[HttpGet("{id}")]

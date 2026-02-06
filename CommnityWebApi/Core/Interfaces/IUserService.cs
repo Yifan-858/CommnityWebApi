@@ -9,5 +9,8 @@ namespace CommnityWebApi.Core.Interfaces
         Task<string> RegisterUser([FromBody] SignUpDTO signUpDTO);
         string GenerateToken(User user);
         Task<User> Login([FromBody] LoginDTO login);
+        Task<User> GetUserById(int userId);
+        Task<User> UpdateUserProfile(int userId, string? userName, string? email, string? passwordHash);
+        Task DeleteUser(int userId);
     }
 }

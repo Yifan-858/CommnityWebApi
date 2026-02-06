@@ -1,7 +1,9 @@
-﻿using CommnityWebApi.Core.Interfaces;
+﻿using AutoMapper;
+using CommnityWebApi.Core.Interfaces;
 using CommnityWebApi.Data.DTO;
 using CommnityWebApi.Data.Entities;
 using CommnityWebApi.Data.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,11 +16,13 @@ namespace CommnityWebApi.Core.Services
     {
         private readonly IUserRepo _userRepo;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public UserService(IUserRepo userRepo, IConfiguration configuration)
+        public UserService(IUserRepo userRepo, IConfiguration configuration,IMapper mapper)
         {
             _userRepo = userRepo;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         public async Task<string> RegisterUser([FromBody] SignUpDTO signUpDTO)
@@ -79,6 +83,29 @@ namespace CommnityWebApi.Core.Services
             }
 
             return user;
+        }
+
+        public async Task<User> GetUserById(int userId)
+        {
+            return await _userRepo.GetUserById(userId);
+        }
+
+        public async Task<User> UpdateUserProfile(int userId, string? userName, string? email, string? passwordHash )
+        {
+            var user = await _userRepo.UpdateUser(userId, userName, email, passwordHash);
+
+            return user;
+        }
+
+        public async Task DeleteUser(int userId)
+        {
+            var user = await _userRepo.GetUserById(userId);
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            await _userRepo.DeleteUser(user);
         }
     }
 }

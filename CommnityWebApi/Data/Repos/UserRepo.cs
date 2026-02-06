@@ -64,19 +64,10 @@ namespace CommnityWebApi.Data.Repos
             return user;
         }
 
-        public async Task<bool> DeleteUser(int id)
+        public async Task DeleteUser(User user)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
-
-            if(user == null)
-            {
-                return false;
-            }
-
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
-
-            return true;
         }
     }
 }
