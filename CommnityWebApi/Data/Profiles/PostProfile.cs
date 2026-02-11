@@ -12,7 +12,7 @@ namespace CommnityWebApi.Data.Profiles
             CreateMap<Post, PostDTO>()
                 .ForMember(destination => destination.Title, opt => opt.MapFrom(origin => origin.Title))
                 .ForMember(dest => dest.Text, opt => opt.MapFrom(origin => origin.Text))
-                .ForMember(dest => dest.Category, opt => opt.MapFrom(origin => origin.Categories))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(origin => origin.Categories.Select(c=>c.CategoryName)))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(origin => origin.UserId))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(origin => origin.User.UserName));
         }

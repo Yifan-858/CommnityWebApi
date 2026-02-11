@@ -66,24 +66,25 @@ namespace CommnityWebApi.Core.Services
 
         public async Task<List<PostDTO>> GetPostsByTitle(string title)
         {
-            var query = _context.Posts.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(title))
+            if (string.IsNullOrWhiteSpace(title))
             {
-                title = title.Trim().ToLower();
-                query = query.Where(p => p.Title.ToLower().Contains(title));
+                throw new ArgumentNullException("Must provide valid title."); 
             }
 
-            var posts = await query.ToListAsync();
-            var postDtos = _mapper.Map<List<PostDTO>>(query);
+            var posts = await _postRepo.GetPostsByTitle(title);
+
+            var postDtos = _mapper.Map<List<PostDTO>>(posts);
             return postDtos;
         }
 
         public async Task<List<PostDTO>> GetPostsByCategory(int categoryId)
         {
-            var posts = await _context.Posts
-                .Where(p=> p.Categories.Any(c=>c.CategoryId == categoryId))
-                .ToListAsync();
+            if(categoryId <= 0)
+            {
+                throw new ArgumentException("Invalid category id");
+            }
+
+            var posts = await _postRepo.GetPostsByCategoryId(categoryId);
            
             var postDtos = _mapper.Map<List<PostDTO>>(posts);
             return postDtos;
@@ -96,12 +97,18 @@ namespace CommnityWebApi.Core.Services
             return post;
         }
 
-        public async Task DeletePost(int postId)
+        public async Task DeletePost(int postId, int userId)
         {
-            var post = await _postRepo.GetPostById(postId);
-            if (post == null)
+            var currentPost = await _postRepo.GetPostById(postId);
+
+            if (currentPost == null)
             {
-                throw new KeyNotFoundException("Post not found");
+               throw new KeyNotFoundException("Post not found"); 
+            }
+
+            if (userId != currentPost.UserId) 
+            {
+               throw new UnauthorizedAccessException("Unauthorized User: cannot delete other's post.");
             }
 
             await _postRepo.DeletePost(postId);

@@ -1,4 +1,5 @@
-﻿using CommnityWebApi.Data.Entities;
+﻿using CommnityWebApi.Data.DTO;
+using CommnityWebApi.Data.Entities;
 using CommnityWebApi.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,6 +52,35 @@ namespace CommnityWebApi.Data.Repos
         public async Task<Post> GetPostById(int postId)
         {
             return await _context.Posts.SingleOrDefaultAsync(p=> p.PostId == postId);
+        }
+
+        public async Task<List<Post>> GetPostsByTitle(string title)
+        { 
+            title = title.Trim().ToLower();
+            var posts = await _context.Posts
+                .Where(p => p.Title != null && p.Title.ToLower().Contains(title))
+                .Include(p=> p.Categories)
+                .Include(p=> p.User)
+                .ToListAsync();
+
+            return posts;
+        }
+
+        public async Task<List<Post>> GetPostsByCategoryId(int categoryId)
+        {
+            var categoryExists = await _context.Category.AnyAsync(c => c.CategoryId == categoryId);
+            if (!categoryExists)
+            {
+                throw new KeyNotFoundException("Can not find the category");
+            }
+
+            var posts = await _context.Posts
+                .Where(p=> p.Categories.Any(c=>c.CategoryId == categoryId))
+                .Include(p=>p.Categories)
+                .Include(p=> p.User)
+                .ToListAsync();
+
+            return posts;
         }
 
         public async Task<Post> UpdatePost(int postId, string? title, string? text, List<Category>? category)

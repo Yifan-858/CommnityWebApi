@@ -113,18 +113,38 @@ namespace CommnityWebApi.Controllers
             return Ok(post);
         }
 
-        [HttpGet("search/{title}")]
+        [HttpGet("search_title")]
         public async Task<IActionResult> GetPostsByTitle([FromQuery] string title)
         {
-            var posts = await _postService.GetPostsByTitle(title);
-            return Ok(posts);
+            try
+            {
+                var posts = await _postService.GetPostsByTitle(title);
+                return Ok(posts);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest(ex.Message);
+            }            
+            
         }
 
-        [HttpGet("search/{categoryId}")]
+        [HttpGet("search_category")]
         public async Task<IActionResult> GetPostsByCategory([FromQuery] int categoryId)
         {
-            var posts = await _postService.GetPostsByCategory(categoryId);
-            return Ok(posts);
+            try
+            {
+                var posts = await _postService.GetPostsByCategory(categoryId);
+                return Ok(posts);
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            
         }
 
         [Authorize]
@@ -166,24 +186,19 @@ namespace CommnityWebApi.Controllers
                 return BadRequest("Invalid access"); 
             }
 
-            var currentPost = await _postService.GetPostById(postId);
-
-            if (currentPost == null)
-            {
-                return NotFound("Post not found"); 
-            }
-
-            if (userId != currentPost.UserId) 
-            {
-                return BadRequest("Unauthorized User");
-            }
-
             try
             {
-                await _postService.DeletePost(postId);
+                await _postService.DeletePost(postId,userId);
                 return Ok($"Post with postId: {postId} is deleted");
             }
-            catch (KeyNotFoundException ex) { return NotFound(ex.Message); }
+            catch (KeyNotFoundException ex) 
+            { 
+                return NotFound(ex.Message); 
+            }
+            catch(UnauthorizedAccessException ex)
+            { 
+                return BadRequest(ex.Message); 
+            } 
         }
        
     }

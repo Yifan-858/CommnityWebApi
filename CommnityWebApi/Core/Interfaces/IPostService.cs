@@ -13,6 +13,6 @@ namespace CommnityWebApi.Core.Interfaces
         Task<List<PostDTO>> GetPostsByTitle(string title);
         Task<List<PostDTO>> GetPostsByCategory(int categoryId);
         Task<Post> UpdatePost(int postId, string? title, string? text, List<Category>? category);
-        Task DeletePost(int postId);
+        Task DeletePost(int postId, int userId);
     }
 }

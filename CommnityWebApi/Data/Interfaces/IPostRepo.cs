@@ -9,6 +9,8 @@ namespace CommnityWebApi.Data.Interfaces
        Task<List<Post>> GetAllPosts();
        Task<List<Post>> GetPostsByUser(int userId);
        Task<Post?> GetPostById(int postId);
+       Task<List<Post>> GetPostsByTitle(string title);
+       Task<List<Post>> GetPostsByCategoryId(int categoryId);
        Task<Post> UpdatePost(int postId, string? title, string? text, List<Category>? category);
        Task<bool> DeletePost(int postId);
         

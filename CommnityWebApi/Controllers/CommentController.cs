@@ -27,23 +27,24 @@ namespace CommnityWebApi.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var postId = addCommentDTO.postId;
-            var currentPost = await _postService.GetPostById(postId);
 
-            if(currentPost == null)
-            {
-                return NotFound("Failed to fetch post");
+            try 
+            { 
+                var currentPost = await _postService.GetPostById(postId);
+                var createdAt = DateTime.UtcNow;
+                var comment = await _commentService.AddComment(addCommentDTO.Content,userId,postId,createdAt);
+                return Ok(comment);
             }
-
-            if(currentPost.UserId == userId)
+            catch(KeyNotFoundException ex)
             {
-                return BadRequest("Cannot leave comment on your own post");
+                return NotFound(ex.Message);
             }
-
-            var createdAt = DateTime.UtcNow;
-
-            var comment = await _commentService.AddComment(addCommentDTO.Content,userId,postId,createdAt);
-
-            return Ok(comment);
+            catch(InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            { return BadRequest(ex.Message); }
         }
 
         [Authorize]

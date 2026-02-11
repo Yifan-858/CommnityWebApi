@@ -25,7 +25,20 @@ namespace CommnityWebApi.Core.Services
 
         public async Task<CommentDTO> AddComment(string content, int userId, int postId, DateTime createAt)
         {
+            var currentPost = await _postRepo.GetPostById(postId);
+
+            if(currentPost == null)
+            {
+                throw new KeyNotFoundException("Post not found");
+            }
+            
+            if(currentPost.UserId == userId)
+            {
+                throw new InvalidOperationException("You cannot comment on your own post"); //UnauthorizedAccessException?
+            }
+
             var comment = await _commentRepo.AddComment(content, userId, postId, createAt);
+
             if(comment == null)
             {
                 throw new Exception($"Failed to add comment");
