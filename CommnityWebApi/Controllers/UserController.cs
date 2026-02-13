@@ -99,10 +99,21 @@ namespace CommnityWebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            var userIdentifier = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdentifier, out var userId))
+            {
+                return Unauthorized("Invalid user identity");
+            }
+
+            if(id != userId)
+            {
+                return Unauthorized("You cannot delete other user");
+            }
+
             try
             {
-                await _userService.DeleteUser(id);
-                return Ok($"User with id: {id} is deleted");
+                await _userService.DeleteUser(userId);
+                return Ok($"User with id: {userId} is deleted");
             }
             catch (Exception ex) { return NotFound(ex.Message); }
              
