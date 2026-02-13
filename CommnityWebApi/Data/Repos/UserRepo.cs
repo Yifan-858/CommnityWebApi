@@ -66,7 +66,23 @@ namespace CommnityWebApi.Data.Repos
 
         public async Task DeleteUser(User user)
         {
+            var posts = _context.Posts
+            .Where(p => p.UserId == user.UserId);
+
+            var comments = _context.Comment
+                .Where(c => c.UserId == user.UserId);
+
+            var postIds = posts.Select(p => p.PostId);
+
+            var commentsOnPosts = _context.Comment
+                .Where(c => c.PostId != null && postIds.Contains(c.PostId.Value));
+
+            _context.Comment.RemoveRange(commentsOnPosts);
+            _context.Comment.RemoveRange(comments);
+            _context.Posts.RemoveRange(posts);
+
             _context.Users.Remove(user);
+
             await _context.SaveChangesAsync();
         }
     }

@@ -155,7 +155,8 @@ namespace CommnityWebApi.Data.Migrations
                 {
                     b.HasOne("CommnityWebApi.Data.Entities.Post", "Post")
                         .WithMany()
-                        .HasForeignKey("PostId");
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CommnityWebApi.Data.Entities.User", "User")
                         .WithMany()
