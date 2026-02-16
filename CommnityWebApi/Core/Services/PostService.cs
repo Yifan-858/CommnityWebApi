@@ -55,11 +55,6 @@ namespace CommnityWebApi.Core.Services
         {
             var post = await _postRepo.GetPostById(postId);
 
-            if( post == null)
-            {
-                throw new KeyNotFoundException("Post not found");
-            }
-
             var postDTO = _mapper.Map<PostDTO>(post);
             return postDTO;
         }
